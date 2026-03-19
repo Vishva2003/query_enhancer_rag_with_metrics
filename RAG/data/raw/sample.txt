@@ -1,0 +1,207 @@
+Abstract:
+This work presents a novel perspective towards generating automated multiple-choice questions (MCQs)-a task fundamentally different due to the highly dynamic nature of computer science education, which spans several sub-domains. Taking advantage of Conditional Generative Adversarial Networks (cGANs), our model provides a versatile approach to addressing the need for diversity and context in relevant MCQ generation across proficiency levels, topic areas. Resulting MCQs inspire implementations within a variety of educational environments - from classrooms, to online courses, and finally exams - equipping teachers with an instrument that could be easily adapted based on the specific needs o students. The model is trained on a carefully constructed dataset that includes material from more than 20 subareas in computer science, consisting of materials such as textbooks, online encyclopedias and Q&A websites. Through rigorous evaluation using comprehensive performance metrics, including Question Relevance Score (QRS), Diversity Index (DI), and Difficulty Alignment Accuracy (DAA), we demonstrate the efficacy and robustness of our framework in generating high-quality MCQs. Moreover, we address ethical considerations inherent in AI-driven educational assessment, ensuring fairness, transparency, and accountability in the MCQ generation process. The cGAN architecture facilitates the generation of contextually relevant MCQs across various proficiency levels and subject domains, enhancing the educational assessment process. The comprehensive dataset developed for this study encompasses diverse computer science topics curated from authoritative textbooks, online resources, question banks, and instructor-generated content. Additionally, a user-friendly QT application has been developed, enabling seamless integration of the cGAN model into educational environments. Through rigorous evaluation and ethical considerations, this framework demonstrates its efficacy, ensuring fairness, tr...
+Show More
+
+Proposed cGAN for text generation.
+Proposed cGAN for text generation.
+Published in: IEEE Access ( Volume: 13)
+Page(s): 16697 - 16715
+Date of Publication: 16 January 2025 
+Electronic ISSN: 2169-3536
+DOI: 10.1109/ACCESS.2025.3530474
+Publisher: IEEE
+Funding Agency:
+CCBY - IEEE is not the copyright holder of this material. Please follow the instructions via https://creativecommons.org/licenses/by/4.0/ to obtain full-text articles and stipulations in the API documentation.
+SECTION I.Introduction
+In the dynamic landscape of educational assessment, the continuous evolution of technology has precipitated groundbreaking methodologies, each aimed at refining and elevating traditional evaluation practices [1]. One particularly innovative approach that stands at the forefront of this transformative wave is the application of Conditional CGANS for the purpose of generating MCQs within the realm of computer science education [2]. This cutting-edge technique represents a paradigm shift, introducing a personalized and adaptive dimension to the evaluation process, strategically personalized to assess students across diverse proficiency levels [3]. In delving into the intricacies of cGAN-based MCQ generation, this approach not only signals a departure from conventional assessment systems but also presents a compelling solution to the inherent limitations and challenges that have long persisted in educational evaluation methodologies [4]. Traditionally, educational assessments have relied on standardized testing and manual question creation, posing inherent challenges such as time constraints for educators, limited personalization, and a one-size-fits-all approach [5]. However, with the advent of transformative methodologies driven by technological advancements, the educational landscape is witnessing a paradigmatic shift. This shift is characterized by a relentless pursuit of methodologies that transcend the limitations of traditional assessment, embracing innovation to better cater to the diverse needs and proficiency levels of the student body [6].
+
+At the forefront of this technological frontier is the application of Conditional CGANS, an advanced class of machine learning models renowned for their capacity to generate realistic and contextually relevant content [7]. In the context of educational assessment, particularly within the domain of computer science, cGANs emerge as a transformative force, providing an avenue for the automated generation of MCQs with a level of personalization and adaptability that was hitherto unprecedented [8]. The core essence of employing cGANs for MCQ generation lies in the capacity to tailor assessments to the unique learning trajectories and expertise levels of individual students. By incorporating specific conditions or parameters during the generation process, cGANs facilitate the creation of MCQs that are finely attuned to the proficiency spectrum, ranging from beginner to intermediate and expert levels [9]. MCQs have entrenched themselves as a fundamental and widely embraced component of educational assessments, owing to their unparalleled efficiency in appraising a student’s comprehension across a diverse spectrum of subjects [10]. The prototypical format of MCQs is a stem followed by multiple answer choices, providing an equal and unbiased manner to evaluate students. It goes beyond speciality areas and crosses all the branches making MCQs a versatile tool in pedagogical repertoire with universal applicability [11]. The stem is designed to evoke a particular type of response from the examinee, establishing an intellectual climate for further testing [12]. The stem is accompanied by a set of answer options (among which the correct answer and distracters are placed strategically). Its components interact intricately to create one whole, which encompasses the basis of MCQ and ultimately contributes to making them a valid method for assessment [13]. MCQs based systems are considered very objective for binary grading but not only they give a one-dimensional sight of students performance, which is debatable point. This objectivity, in part due to the structured form of MCQs - each question being designed in essentially equal format and scored objectively on responses. [14].
+
+With a continuously shifting educational landscape and an increasing need for more diverse, timely, expert-level questions educators now find themselves faced with a set of complexities that require novel solutions [15]. Even with these various structural changes, it is clear that a fresh approach to MCQ generation was long overdue and adapting limited traditional methodologies only provided the foundation for next-generation alternatives which can continuously adapt based on individual learning styles [16]. Traditional MCQ generation carries with it one of its biggest problems - in the fact that it is resource-heavy. Ensuring that not only the quality of questions are diverse, up to date and expert-level proficient requires significant time and effort from educators as well [17]. Building a comprehensive repository of questions manually, versatile enough to span the range and breadth in any given subject area can be arduous task that could potentially take resources away from other important facets of teaching/learning [18]. As educational institutions work to create high quality curricula and assessments, the resource constraints on traditional MCQ creation methods become more obvious [19].
+
+Traditional question banks, while serving as repositories of knowledge, often fall short in providing adaptive assessments that cater to the unique needs and expertise levels of individual learners [20]. Teachers look for more automation abilities that technology can provide to successfully add insights and improve assessments beyond the manual question making [21]. From this perspective, seeking fresh methods of MCQ generation is in sync with the grand theme for modern education using technology as an enabler to provide a dynamic engagement and focus on student-centric learning. The uptake of modern technological practices, such as Conditional CGANS is a promising potential solution to challenges encountered with outdated MCQ generation methodologies and can pave the way for an evolutionary step into future-proofing assessment environments that are both best-suited and inclusive [21].
+
+Various artificial intelligence and natural language processing tools have been improved significantly for the automating MCQs generation; in this respect it is essential to choose a good model. Though many different tools -that are both AI-based and NLP based - have very promising features, Generative Adversarial Networks (GANs) seem to show the most potential for producing content which is realistic sounding and contextually aware. GANs use a special kind of adversarial training, in which the generator and discriminator take turns trying to outdo each other - promoting creation content creativity/improvisation. Among the GAN variants, Conditional GANs (cGANs) emerge as an ideal choice for MCQ generation in educational settings. The conditional nature of cGANs enables the incorporation of specific parameters or conditions during the generation process. In the context of educational assessments, this means tailoring questions to match the proficiency levels of students, distinguishing between beginners, intermediates, and experts. This adaptability ensures that assessments align closely with individual learning trajectories [22].
+
+The adoption of a cGAN-based MCQ generation system offers several compelling advantages: The cGAN model allows for the creation of MCQs that are tailored to the expertise level of each student. This personalized approach fosters a more engaging and effective learning experience.
+
+By categorizing questions into beginner, intermediate, and expert levels, the system provides adaptive assessments that evolve with the learner’s progress, ensuring an appropriate level of challenge [23]. By varying levels of difficulties of questions to cater the customization for students it also promotes greater student engagement, striking a good balance between challenging them to aim high but being there along the way [24].
+
+Detail on cGAN’s application for MCQ generation has quite a few benefits but some challenges need to be noticed: The produced questions have good quality and are true. A rigorous review process which has inputs from educators and domain experts for reviewing the assessments is important to preserve their reliability [26]. Ethical considerations, specifically relating to bias in questions created remain top-of-mind. The need for fair and unbiased assessments is of utmost importance to maintain the sanctity and reliability of education. Educational content is an ever-evolving beast. Feedback, iteration and updating mechanisms must be established in the cGAN model to maintain assessments timely according to new educational standards [25].
+
+Contribution Reflecting Novelty in Work:
+
+The proposed cGAN-based MCQ generation framework represents a novel contribution to the field of computer science education assessment. Unlike traditional approaches, which often rely on manual question authoring or rule-based generation techniques, our method harnesses the power of deep learning and adversarial training to autonomously generate contextually relevant and diverse MCQs. This innovative approach offers several key contributions:
+
+Our framework leverages Conditional CGANS, a cutting-edge deep learning architecture, to tailor question generation according to specified difficulty levels and fields of study. By incorporating conditional inputs, our model can produce personalized and adaptive MCQs that cater to the unique learning needs and proficiency levels of individual students.
+
+We curated a comprehensive dataset comprising a diverse range of computer science topics sourced from authoritative textbooks, online resources, question banks, and instructor-generated content. This extensive dataset ensures the model’s exposure to varied linguistic patterns, thematic contexts, and difficulty levels, enhancing the richness and diversity of generated MCQs.
+
+We devised a robust evaluation framework encompassing multiple performance metrics, including QRS, Diversity Index (DI), Difficulty Alignment Accuracy (DAA), and Semantic Equivalence Score (SES). This holistic approach enables comprehensive assessment of the generated MCQs’ quality, relevance, diversity, and alignment with predefined difficulty levels, ensuring the reliability and validity of the evaluation results.
+
+The integration of a Conditional Generative Adversarial Network (cGAN) into a user-friendly Graphical User Interface (GUI) marks a significant contribution to the field of computer science education. This novel approach streamlines the process of generating contextually relevant and diverse MCQs tailored to specific difficulty levels and subject domains. By leveraging the capabilities of cGANs, the application offers a dynamic and adaptable solution for educators, students, and professionals seeking to create high-quality assessment materials.
+
+SECTION II.Literature Review
+This research critically examines the impact of ChatGPT in higher education [26], employing thin ethnography to elucidate its perspectives on challenges and opportunities. While personalized learning and enhanced accessibility emerge as potential benefits, concerns loom over issues such as plagiarism and the potential weakening of critical thinking skills. A balanced and cautious approach is crucial to harness the advantages of ChatGPT while addressing and mitigating associated risks in higher education.
+
+This review paper undertakes a meticulous analysis of 207 research papers [27], employing the PRISMA framework alongside content and bibliometric analyses, to delve into the promising potential of Generative Artificial Intelligence (GAI) in education. Study has been carried out, and it identifies the key takeaways like where GAI can be applied to working towards medical & engineering education. The paper closes by arguing for providing directions on future research in the GAI-assisted curriculum design and what benefits will have long term effects of this GAI-aided learning. This expansive review will serve as an invaluable blueprint assisting researchers, educators and most importantly policy makers in the informed integration of GAI into the educational paradigm.
+
+This paper undertakes an extensive exploration of the potential of Artificial Intelligence (AI), specifically focusing on Natural Language Processing (NLP) and Large Language Models (LLMs) such as GPT-4 and BARD, to usher in a paradigm shift in both educational and research domains [28]. At the same time however, it looks into transformational use cases in education like educational assistance and feedback, library evaluation & grades and teaching strategies right up to formulating our career paths or helping students with mental health support as well. The article earnestly discusses the challenges involved in this disruptive journey, which comes with a strong emphasis about ethical considerations as well as algorithmic biases.
+
+This study investigates the underexplored realm of employing generative artificial intelligence (AI) [29], specifically ChatGPT-3.5 and 4, in primary school education. In a project involving 110 pupils aged 8-14 from two schools, the research illustrated that this approach is capable of producing bespoke learning resources which exhibit potential for personalized education. The findings highlight that efforts are warranted to ensure generative AI is integrated in an impactful, inclusive and sustainable manner within the primary school education landscape. Whilst the journey to world-class generative AI continues, this paper is a testament of how it will inevitably play out by demonstrating one step closer towards an optimized learning experience in using sophisticated models which learn with and beyond humans - for human intelligence.
+
+This article explores the impact of ChatGPT, a generative AI tool, on education in China [30]. While recognizing the possibility for personalized learning and digital transformation, it also discusses difficulties such as fears of academic integrity or lack of ability in critical thinking. This study will integrate the ChatGPT model as an educational tool carefully based on a systematic review of Chinese scholars and experts opinions. The new framework, “Development-Administration-Teaching-Student (DATS)”, is designed to inform future implementations grounded in the insights of developers, administrators and teachers/students. The author discuss ChatGPT as a platform China had already mastered and the necessity for responsible deployment to confront education in China where it is today.
+
+This research investigates the application of ChatGPT, a generative AI, in science education, focusing on its proficiency in answering scientific questions, educational applications for teachers, and its role as a research tool [31]. The results shows that the ChatGPT can be employed to solve questions yet impart challenges on how it would convey information as such a strong claim. Educators have a role to model responsible AI use and stress the importance of critical thinking, in addition to setting clear student expectations.
+
+This article employs critical analysis and paradox theory to explore the multifaceted role of Generative AI in education [32]. The paper argues it as a fovour, and a foe face accessible yet also limiting sometimes without going into full lock down state of use in mainstream acceptance. This specific analysis brings a level of clarity that furthers our overall understanding - which is incredibly valuable for administrators, policy makers and other stakeholders involved in the future of education.
+
+This paper explores ChatGPT’s potential in education, emphasizing its role as a conversational agent to enhance teaching and learning [33]. While the study points out limitations of this generative AI model, such as require to know human-like text and training data dependency (existing models better for image-textbert generation), it underscores its potential promise needs in new areas like prompt engineering. It highlights the role of human agents not only to navigate possible pitfalls but also in order for ChatGPT innovation within education is leveraged effectively, with some adjustments made now.
+
+This paper explores the transformative potential of Generative Pre-trained Transformer (GPT) AI in education [34], specifically focusing on its role in enhancing collaborative learning and knowledge building. To further advance this argument - that integrating AI can be aligned with pedagogical ideals, the study presents practical designs based on “knowledge building” pedagogy. This paper is written for educators, researchers and all others intending to use Generative AI in teaching practices with a view towards generating insights that will open up discussions furthering best-pactices.
+
+This study addresses the limitations of traditional learning technologies in universities by proposing the integration of intelligent chatbots powered by generative AI [35]. The study highlights how chatbots show promise in helping to boost learner engagement, offer immediate feedback and tailor learning experiences. By leveraging generative AI tools the proposed concept aims to allow online student-to-student interaction and self-paced learning in an automated course creation module for instructors. Designed for university educators, administrators and academics researching AI in education, the research is to help this work better drive effective implementation through a more joined up approach of delivering an enhanced learning experience at scale.
+
+SECTION III.Methodology
+A. Dataset Development
+1) Data Collection
+The dataset for this study was meticulously curated from authoritative textbooks integral to the computer science degree program. These textbooks spanned an array of comprehensive subjects, encompassing the foundational and advanced knowledge areas of programming languages, theoretical computer science, networks and communication, databases, artificial intelligence, operating systems, software engineering, web technologies, cybersecurity, computer graphics, human-computer interaction, software architecture, Internet of Things (IoT), big data and data science, software testing and quality assurance, mobile application development, and computer ethics and professionalism. Table 1 illustrates the distribution of samples across various computer science fields, forming a comprehensive dataset for assessing educational proficiency levels.
+
+TABLE 1 Distribution of Samples Across Computer Science Fields, Forming a Comprehensive Dataset for Varied Educational Proficiency Levels
+Table 1- Distribution of Samples Across Computer Science Fields, Forming a Comprehensive Dataset for Varied Educational Proficiency Levels
+
+2) Online Educational Resources
+Complementary to traditional textbooks, pertinent content was also sourced from reputable online educational platforms, ensuring a contemporary and diverse representation of computer science concepts. This involved meticulous consideration of content quality, relevance, and adherence to the specified topics.
+
+3) Existing Question Banks
+To enrich the dataset, select question banks related to computer science education were integrated. These sources served as reservoirs of validated questions, ensuring a broad spectrum of topics and difficulty levels.
+
+4) Instructor-Generated Content
+In order to tailor the dataset to the specific needs of the study, supplementary content was developed by domain experts and educators. This content was aligned with the curriculum objectives and provided a bespoke dimension to the dataset. Table 2 provides a snapshot of varied multiple-choice questions, showcasing the diversity of the comprehensive dataset used for computer science education assessment.
+
+TABLE 2 Varied Multiple-Choice Questions Representing a Snapshot of the Comprehensive Dataset for Computer Science Education Assessment
+Table 2- Varied Multiple-Choice Questions Representing a Snapshot of the Comprehensive Dataset for Computer Science Education Assessment
+
+5) Custom MCQS Bank
+This study leverages a diverse array of online resources, including LeetCode, HackerRank, Interview Cake, Codewars, GeeksforGeeks, CodinGame, Sphere Online Judge, HackerEarth, and Project Euler, to curate a rich dataset for the automated generation of multiple-choice questions (MCQs) in computer science education. By tapping into these platforms, which offer a wealth of coding challenges and problem-solving exercises, we ensure the breadth and depth of topics covered in our MCQ bank. Furthermore, our dataset is augmented by insights from prominent textbooks such as “ Grokking artificial intelligence algorithms [36],” “Introduction to Algorithms [37]”, “Cracking the code: Co-coding with AI in creative programming education [38]”, “MCQs in Computer Science [39]”, “Data Structures and Algorithms in Python [40],” and “Computer Networking: A Top-Down Approach [41].” Drawing from these authoritative sources, we enrich our MCQ bank with a wide spectrum of topics, ranging from fundamental algorithms and data structures to advanced networking concepts.
+
+6) Categorizing Data for Model Development
+Rigorous criteria, grounded in pedagogical principles, were employed to categorize questions into distinct difficulty levels—beginner, intermediate, and expert. The complexity of concepts, problem-solving requirements, and depth of understanding were integral considerations in this categorization process. A panel of subject matter experts, possessing substantial proficiency in the diverse fields of computer science, was engaged to validate and assign difficulty levels to questions. Their expertise ensured a nuanced and accurate classification reflective of the intended difficulty spectrum. Deliberate efforts were made to achieve a balanced distribution of questions across difficulty levels. This equilibrium ensured the representation of each proficiency tier, contributing to the overall robustness of the dataset. Choices accompanying each question were meticulously annotated with difficulty levels. This granular annotation facilitated the generation of varied and contextually relevant multiple-choice options for each question. The table 3 presents the variety of computer science questions sourced from textbooks, online resources, question banks, and instructors, collectively forming a comprehensive dataset for educational assessment in computer science.
+
+TABLE 3 Variety of Computer Science Questions Sourced From Textbooks, Online Resources, Question Banks, and Instructors, Forming a Comprehensive Dataset
+Table 3- Variety of Computer Science Questions Sourced From Textbooks, Online Resources, Question Banks, and Instructors, Forming a Comprehensive Dataset
+
+B. Model Development
+1) Model Architecture
+The text-based MCQs are tokenized, transforming them into sequences of numerical tokens. This step captures the semantic meaning of words and allows the model to work with numerical representations of the input. To create uniform input sequences, padding is applied to the tokenized sequences. This ensures that all sequences have the same length, facilitating efficient batch processing during model training. Tokenized sequences are embedded into high-dimensional vectors using pre-trained word embeddings or embedding layers. Embeddings capture the semantic relationships between words and enable the model to understand the context of the MCQs. Metadata, including difficulty level and field of study, is appropriately encoded and combined with the tokenized text data. This allows the model to consider additional contextual information during MCQ generation (see Figure 1 for the proposed cGAN for text generation).
+
+FIGURE 1. - Proposed cGAN for text generation.
+
+FIGURE 1.
+Proposed cGAN for text generation.
+
+Show All
+
+This table 4 below illustrates the step-by-step preprocessing of a programming-related Multiple-Choice Question (MCQ). The process includes tokenization to break down the text into individual tokens, padding to ensure uniform sequence length, embedding to convert tokens into high-dimensional vectors, and metadata processing, incorporating difficulty level and field of study. The resulting processed data is essential for inputting into the Conditional Generative Adversarial Network (cGAN) model for MCQ generation. The table 4 illustrates the preprocessing steps undertaken for a programming-related Multiple-Choice Question (MCQ).
+
+TABLE 4 Preprocessing Steps for a Programming-Related MCQ
+Table 4- Preprocessing Steps for a Programming-Related MCQ
+
+MCQ Generation:- It completely depends on how you design a cGAN. Model architecture is an important variable in how well the model can learn these patterns, ask appropriate questions that make sense given context of input and adapt depending on user response. The cGAN used in this research is designed especially for the requirements of educational assessment. It is made up of a generator and discriminator which keep trying to out play each other in the zero sum game designed for our MCQ generation. The generator (a recurrent neural network, RNN) is implemented to contain several layers of Long Short-Term Memory (LSTM) units in order to maintain the natural process through time and enhance connectedness between words. Dropping out is coupled with each LSTM layer to avoid overfitting and improve generalization. The discriminator, a convolutional neural network (CNN), serves as the discerning component, evaluating the authenticity and relevance of generated questions. Convolutional layers, complemented by max-pooling operations, enable the extraction of salient features crucial for discriminating between genuine and synthetic MCQs.
+
+These changes were made to adapt the cGAN for MCQ generation. A conditional input layer receiving metadata, such as the desired difficulty level and subject matter, was added. By tuning the cGAN, explicit proficiency tiers and subject domains can be targeted in the generated questions.
+
+Training the model on balanced data across fields and difficulty levels involves using Adam optimization with changes in the learning rate to aid convergence. During the training process, for each iteration, a generator and discriminator are set up in an adversarial training paradigm, where one generates some images to try to fool the other. The Table 6 contains the hyperparameters used for training cGAN. Moreover, the cGAN architecture, as shown in Figure 2, provides details about how the model was structured and built.
+
+TABLE 5 cGAN Architecture Layers and Parameters for Text-Based MCQ Generation
+Table 5- cGAN Architecture Layers and Parameters for Text-Based MCQ Generation
+
+TABLE 6 Model Hyperparameters
+Table 6- Model Hyperparameters
+
+FIGURE 2. - Conditional Generative Adversarial Network (cGAN) Architecture.
+
+FIGURE 2.
+Conditional Generative Adversarial Network (cGAN) Architecture.
+
+Show All
+
+2) Training Process
+Training the cGAN is a complex and stage-wise process, necessary to equip it with skills to create rich informative MCQs. This part presents the complete methodology covers key aspects such as number of epochs, batch sizes, learning rates and regularization techniques through which these models were developed. And the cGAN is trained for a large number of epochs to understand how MCQs are generated. During training the model continuously performs gradual optimization over several epochs, finding a balance between convergence and avoiding complete lack of generalization (overfitting). This duration is determined empirically to give an excellent but subtle view of the rich variety half-a-million rows in your data. A batch size of 64 is used to perform efficient gradient calculations and update parameters. This equilibrium allows the generator and disciminator to converge which leads not only to stability, but also better generalization. There is always a trade off between batch size and computational efficiency or model performance. An essential component of this is the adaptive learning rate which directs or has a significant influence on what happens in optimization. We use Adam optimization, and a learning rate that is adjusted over the training process. This is an adaptive mechanism which further increases the efficiency of convergence, hence resolving complex gradients by honing in richer generative capabilities.
+
+Dropout mechanisms are strategically emplaced in the generator’s Long Short-Term Memory (LSTM) layers to combat overfitting and improve generalization of the model. A dropout rate of 0.3 and one dose of stochasticity at this point, during training to keep the model from getting attached (to upset dependencies in data). The table 7 presents the parameters utilized during the training process of the cGAN for MCQ generation.
+
+TABLE 7 Training Parameters
+Table 7- Training Parameters
+
+3) Hyperparameter Tuning
+Most importantly and as in any task of machine learning, one of the key steps to improve performance is doing hyperparameter tuning. Following are the hyperparameters which can be tuned to improve model performance in creating diversity, context relevant MCQs:- We tuned the number of LSTM layers within the generator and units per layer to find a good balance between complexity (i.e. model capacity) and ability to capture sequential data dependencies. The discriminator architecture tuned, especially in terms of the convolutional layers and filters to provide better capability for differentiating between real from generated MCQs. The learning rate in the Adam optimization algorithm was optimized to facilitate efficient convergence during training, ensuring the model adapts effectively to the dataset’s nuances. Different batch sizes were experimented with to identify an optimal configuration that balances computational efficiency and model stability. The table 8 outlines the optimized hyperparameters used in the cGAN for MCQ generation, providing crucial insights into the model’s configuration during training.
+
+TABLE 8 Optimized Hyperparameters
+Table 8- Optimized Hyperparameters
+
+4) Data Augmentation
+Data augmentation is a pivotal technique employed to enrich the diversity of the generated questions, promoting better generalization and robustness. In the context of MCQ generation, the following data augmentation techniques were applied:
+
+a: Synonym Replacement
+Words within the stems and choices of MCQs were randomly replaced with synonyms. This technique introduces lexical variations, ensuring the model generates questions with varied language expressions. Table 9 provides an example of synonym replacement applied to multiple-choice questions in the context of MCQ generation for computer science education.
+
+TABLE 9 Example of Synonym Replacement in Multiple-Choice Questions
+Table 9- Example of Synonym Replacement in Multiple-Choice Questions
+
+b: Shuffling Choices
+The order of answer choices in MCQs was randomly shuffled. This aids in preventing the model from learning patterns associated with specific choice positions, fostering adaptability. The table 10 illustrates an example of shuffling choices in multiple-choice questions.
+
+TABLE 10 Example of Shuffling Choices in Multiple-Choice Questions
+Table 10- Example of Shuffling Choices in Multiple-Choice Questions
+
+c: Field-Specific Augmentation
+Field-specific linguistic variations and context-aware modifications were incorporated, ensuring that questions generated within distinct subject domains exhibit nuanced language and thematic diversity. Table 11 illustrates an instance of field-specific augmentation in multiple-choice questions, showcasing variations tailored to specific subject domains.
+
+TABLE 11 Example of Field-Specific Augmentation in Multiple-Choice Questions
+Table 11- Example of Field-Specific Augmentation in Multiple-Choice Questions
+
+C. Performance Evaluation
+1) Evaluation Metrics
+The performance evaluation of the generated MCQs involves a comprehensive set of metrics designed to assess various aspects crucial for their effectiveness in educational contexts. The following metrics were employed to gauge the quality and suitability of the generated MCQs:
+
+a: QRS
+A metric indicating the relevance of each generated question to its corresponding field of study. This score is derived from the alignment of thematic content and subject-specific terminology.
+QRS=w1.Semantic Similarity+w2.Term Overlap+w3Field−Specific Features
+View SourceRight-click on figure for MathML and additional features.Semantic Similarity: The more semantically similar the generated question is to the field of study your working from. For example cosine similarity or word embeddings. Subject Overlap: The generated question can be matched against the field of study in consideration via Jaccard similarity or other term matching approaches, to evaluate how many subject-specific terms overlap between them. Then Field-Specific Features additional capture the field-specific nuances or linguistic variations.
+
+The weights w1,w2 , and w3 the importance or contribution of each factor to the overall QRS. You may need to experiment and fine-tune these weights based on the characteristics of your data and the desired emphasis on different aspects of relevance.
+
+b: Diversity Index
+The Diversity Index (DI) can be formulated to quantify the diversity of generated questions across different fields and difficulty levels. One common approach is to use the Simpson’s Diversity Index, which is a measure of diversity that takes into account both the number of different categories and the distribution of items among those categories.
+D1=1−∑ni=1(ni.(ni−1)N.(N−1)
+View SourceRight-click on figure for MathML and additional features.
+
+ni is the number of questions in the i−th category (combination of field and difficulty level). N is the total number of questions. This formula calculates the probability that two randomly selected questions are from different categories, providing a diversity measure. A higher DI indicates greater diversity across categories.
+
+c: Difficulty Alignment Accuracy
+The Difficulty Alignment Accuracy (DAA) can be calculated by assessing the accuracy of the cGAN in aligning generated questions with predefined difficulty levels. The formula for DAA can be defined as follows:
+DAA=Number of Correct Difficulty AlignmentsTotal Number of Generated Questions×100
+View SourceRight-click on figure for MathML and additional features.where ‘Number of Correct Difficulty Alignments’ is the count of generated questions for which the difficulty level predicted by the cGAN aligns with the actual predefined difficulty level.
+
+‘Total Number of Generated Questions’ is the overall count of questions generated by the cGAN.
+
+The DAA provides a percentage accuracy by measuring the ratio of correctly aligned difficulty levels to the total number of generated questions. A higher DAA value indicates better accuracy in aligning generated questions with the intended difficulty levels.
+
+d: Semantic Equivalence Score
+A Semantic Equivalence Score (SES) to measure how the generated questions align semantically with their stems and choices. The similarity of the stems and choices in a query could provide an SES formula. Cosine similarity is used to calculate this, between vector representations of the text.
+
+Here’s a simplified mathematical equation for SES:
+SES=∑ni=1CosineSimilarity(Stemi,Choicei)n
+View SourceRight-click on figure for MathML and additional features.where: n is the number of choices in a question.
+
+CosineSimilarity(Stemi,Choicei ) calculates the cosine similarity between the vector representations of the stem and choice i in a question. The SES computes the average cosine similarity between the stem and each choice within a question, providing a score that reflects the overall semantic equivalence. A higher SES indicates better semantic coherence between the stems and choices of generated questions. The specific vector representations used for cosine similarity would depend on the encoding or embedding method you employ for your text data.
+
+D. Tools and Technologies
+In the development of the machine learning model, a sophisticated set of programming languages, frameworks, and libraries were meticulously chosen to ensure a robust and efficient workflow. Python, celebrated for its readability and extensive libraries, served as the foundational language for implementing the model, conducting data preprocessing, and evaluating model performance. Python emerged as the primary programming language for its versatility, readability, and the availability of a rich ecosystem of libraries.
+
+1) Machine Learning Frameworks and Libraries
+Tensorflow is opensource machine learning framwork used to develop and train the neural networks, which has a inbuild library so that we can easily implement any implementation(errors are very less) without need of reinvent wheel(reusing). Keras is a high-level neural networks API, capable of running on top of TensorFlow that makes defining and training models easier [42]. NumPy is a powerful scientific computing library for Python which we denote as the manipulation of large arrays and matrices, required by many mathematical operations. For the 2D plotting in Python a library called matplotlob is also used that is needed for visualizations and plots [43], helps when analysing model training processes an dscores. Panadas is a data manipulation and analysis library that includes semi-immutable, size-mutable DataFrames for handling / cleaning & organization of highly groupable time series data.
+
+2) Hardware
+From a hardware standpoint, the project was executed on a high-performance workstation to handle the required computational operations. The workstation featured a multi-core, parallel design Intel Xeon processor, ensuring high reliability and performance. An NVIDIA RTX 3080 graphics card with CUDA cores provided powerful parallel processing capabilities for accelerated deep learning workloads. Additionally, the workstation was equipped with 48GB of DDR4 RAM, offering extended memory capacity to support large datasets and complex calculations with faster processing.
