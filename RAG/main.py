@@ -41,7 +41,7 @@ if __name__ == "__main__":
         for doc, dist in zip(retrieved_data['documents'], retrieved_data['distances']):
             if dist < 1.0:  # Stricter threshold (adjust based on your data)
                 filtered_docs.append(doc)
-                filtered_distances.append(dist)    
+                filtered_distances.append(dist)
         reranked_docs = reranker.rerank(query, filtered_docs, top_k=10)
         context = reranker.format_context(reranked_docs)
         print(f"\nRetrieved Context:\n{context}")

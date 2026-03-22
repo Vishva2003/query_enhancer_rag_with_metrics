@@ -56,9 +56,9 @@ free_models = {
         "Chatgpt-5": "openai/gpt-5-chat",
         "Grok-4-Fast": "x-ai/grok-4-fast",
         "Claude-Sonnet-4.5": "anthropic/claude-sonnet-4.5",
-        "Deepseek-R1": "deepseek/deepseek-r1",
+        "Deepseek-v3": "deepseek/deepseek-chat-v3.1",
         "Gemini-2.5-Flash-lite": "google/gemini-2.5-flash-lite",
         "Qwen3.5-flash-02-23": "qwen/qwen3.5-flash-02-23",
-        "Nemotron-3-nano": "nvidia/nemotron-3-nano-30b-a3b",
+        "MiniMax-m1": "minimax/minimax-m1",
         "Ministral-3": "mistralai/ministral-3b-2512"
     }
