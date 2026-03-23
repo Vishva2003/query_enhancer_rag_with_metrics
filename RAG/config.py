@@ -3,7 +3,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
 
 # Project paths
 PROJECT_ROOT = Path(__file__).parent

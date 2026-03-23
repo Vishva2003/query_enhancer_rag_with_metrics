@@ -9,7 +9,6 @@ from config import free_models
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
 
 
 @st.cache_resource()
