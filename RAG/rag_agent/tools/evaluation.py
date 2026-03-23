@@ -2,6 +2,7 @@
 import numpy as np
 from typing import List, Dict, Any, Optional
 
+
 class RAGEvaluator:
     """
     Simple RAG metrics calculator
@@ -10,7 +11,7 @@ class RAGEvaluator:
     def __init__(self):
         self.metrics_history = []
     
-    def calculate_precision(self, retrieved_docs: List[str], relevant_docs: List[str]) -> float:
+    def calculate_precision(self, retrieved_docs, relevant_docs):
         """
         Calculate precision@k
         """
@@ -19,7 +20,7 @@ class RAGEvaluator:
         relevant_retrieved = [doc for doc in retrieved_docs if doc in relevant_docs]
         return len(relevant_retrieved) / len(retrieved_docs)
     
-    def calculate_recall(self, retrieved_docs: List[str], relevant_docs: List[str]) -> float:
+    def calculate_recall(self, retrieved_docs, relevant_docs):
         """
         Calculate recall@k
         """
@@ -28,7 +29,7 @@ class RAGEvaluator:
         relevant_retrieved = [doc for doc in retrieved_docs if doc in relevant_docs]
         return len(relevant_retrieved) / len(relevant_docs)
     
-    def calculate_mrr(self, retrieved_docs: List[str], relevant_docs: List[str]) -> float:
+    def calculate_mrr(self, retrieved_docs, relevant_docs):
         """
         Calculate Mean Reciprocal Rank
         """
@@ -37,9 +38,9 @@ class RAGEvaluator:
                 return 1.0 / (i + 1)
         return 0.0
     
-    def calculate_ndcg(self, retrieved_docs: List[str], relevant_docs: List[str], k: int = 10) -> float:
+    def calculate_ndcg(self, retrieved_docs, relevant_docs, k = 10):
         """
-        Simplified NDCG calculation
+        Simplified NDNormalized Discounted Cumulative Gain calculation
         """
         if not retrieved_docs or not relevant_docs:
             return 0.0

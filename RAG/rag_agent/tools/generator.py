@@ -28,11 +28,8 @@ class Generator:
         self.site_url = OPENROUTER_SITE_URL
         self.site_name = OPENROUTER_SITE_NAME
         
-        # Free models available on OpenRouter
-        self.free_models = free_models
-        
         # Set default model
-        self.default_model = self.free_models["Gemini-2.5-Flash-lite"]
+        self.default_model = free_models["Gemini-2.5-Flash-lite"]
     
     def generate(self, query, context, model=None, temperature=0.7, max_tokens=1000, top_p=1):
         """
@@ -52,8 +49,7 @@ class Generator:
         
         # Use specified model or default
         model_id = model or self.default_model
-        
-        # Create the prompt (keeping your exact prompt structure)
+
         prompt = f"""
         You are an expert AI assistant answering questions using retrieved documents.
 
@@ -83,7 +79,6 @@ class Generator:
         """
         
         try:
-            # Create completion using OpenAI-compatible structure
             completion = self.client.chat.completions.create(
                 extra_headers={
                     "HTTP-Referer": self.site_url,

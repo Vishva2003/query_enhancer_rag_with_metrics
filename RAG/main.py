@@ -8,7 +8,7 @@ from query_enhancer.tools.query_agent import QueryEnhancer
 from config import DATA_RAW, CHUNK_OVERLAP, CHUNK_SIZE, TOP_K_RESULTS
 
 
-# use your document path here ('Beta_vae.pdf' is just an example, you can replace it with any document you want to test with)
+# use your document path here ('sample.pdf' is just an example, you can replace it with any document you want to test with)
 file_path = DATA_RAW / "sample.pdf"
 
 if __name__ == "__main__":
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     generator = Generator()
     enhancer = QueryEnhancer()
 
-    collection_name = 'bvae_collection'  # you can change this to any name you like related to the document
+    collection_name = 'bvae_collection'  # you can change this to any name you like
 
     if file_path.exists():
         text = loader.load_file(str(file_path))
@@ -39,7 +39,7 @@ if __name__ == "__main__":
         filtered_docs = []
         filtered_distances = []
         for doc, dist in zip(retrieved_data['documents'], retrieved_data['distances']):
-            if dist < 1.0:  # Stricter threshold (adjust based on your data)
+            if dist < 1.0:  # Stricter threshold
                 filtered_docs.append(doc)
                 filtered_distances.append(dist)
         reranked_docs = reranker.rerank(query, filtered_docs, top_k=10)
