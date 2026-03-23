@@ -82,6 +82,7 @@ class DocumentLoader:
             )
 
         try:
+            
             if file_type == '.pdf':
                 return self.pdf_processing(file_path)
             elif file_type in {'.docx', '.doc'}:               # ← remove .doc or handle separately

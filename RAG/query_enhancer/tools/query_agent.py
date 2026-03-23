@@ -43,7 +43,7 @@ Example:
 }}
 
 User question: {query}
-"""
+""" 
 
 
 class QueryEnhancer:
@@ -182,7 +182,7 @@ class QueryEnhancer:
 
 if __name__ == "__main__":
     enhancer = QueryEnhancer(n_subqueries=3, use_hyde=True, use_stepback=True)
-    test_q = "What is beta-VAE?"
+    test_q = "What is RAG"
     results = enhancer.enhance(test_q)
 
     print("=" * 60)
