@@ -1,5 +1,4 @@
 import streamlit as st
-from dotenv import load_dotenv
 from pathlib import Path
 import os
 import tempfile as temp
@@ -7,7 +6,9 @@ import pandas as pd
 import time
 from datetime import datetime
 from config import free_models
+from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
 
