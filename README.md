@@ -259,7 +259,7 @@ Then open your browser to `http://localhost:8501`
 ### Command-Line Script (Linear Pipeline)
 
 ```bash
-python rag_pipeline_linear.py
+python umap.ipynb
 ```
 
 This runs the complete pipeline step-by-step with no functions:
