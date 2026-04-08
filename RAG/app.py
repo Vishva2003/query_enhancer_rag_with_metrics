@@ -191,7 +191,7 @@ if prompt := st.chat_input("Ask a question about the document..."):
                 
                 # Step 3: Rerank documents
                 rerank_start = time.time()
-                reranked_docs = reranker.rerank(prompt, filtered_docs, top_k=10)
+                reranked_docs = reranker.rerank(prompt, filtered_docs, top_k=top_k_results)
                 rerank_time = time.time() - rerank_start
 
                 if not filtered_docs:
