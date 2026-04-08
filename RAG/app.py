@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+
 @st.cache_resource()
 def get_rag_tools():
     from rag_agent.tools.document_loader import DocumentLoader
