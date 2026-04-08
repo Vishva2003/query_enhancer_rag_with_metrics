@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import streamlit as st
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -12,16 +13,16 @@ DATA_PROCESSED = PROJECT_ROOT / "data" / "processed"
 VECTOR_DB_PATH = PROJECT_ROOT / "vector_db"
 
 # API Keys
-GEMINI_LLM_KEY = os.getenv("GEMINI_LLM_KEY")
-GEMINI_DOC_KEY = os.getenv("GEMINI_DOC_KEY")
-GEMINI_QUERY_KEY = os.getenv("GEMINI_QUERY_KEY")
-LLAMA_API_KEY = os.getenv("LLAMA_API_KEY")
+GEMINI_LLM_KEY = os.getenv("GEMINI_LLM_KEY") or st.secrets.get("GEMINI_LLM_KEY")
+GEMINI_DOC_KEY = os.getenv("GEMINI_DOC_KEY") or st.secrets.get("GEMINI_DOC_KEY")
+GEMINI_QUERY_KEY = os.getenv("GEMINI_QUERY_KEY") or st.secrets.get("GEMINI_QUERY_KEY")
+LLAMA_API_KEY = os.getenv("LLAMA_API_KEY") or st.secrets.get("LLAMA_API_KEY")
 
 #Openrouter API
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL") 
-OPENROUTER_SITE_NAME = os.getenv("OPENROUTER_SITE_NAME")
-OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY") or st.secrets.get("OPENROUTER_API_KEY")
+OPENROUTER_SITE_URL = os.getenv("OPENROUTER_SITE_URL") or st.secrets.get("OPENROUTER_SITE_URL")
+OPENROUTER_SITE_NAME = os.getenv("OPENROUTER_SITE_NAME") or st.secrets.get("OPENROUTER_SITE_NAME")
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL") or st.secrets.get("OPENROUTER_BASE_URL")
 
 # Model settings
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
