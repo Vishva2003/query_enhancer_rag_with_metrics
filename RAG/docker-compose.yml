@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  rag-app:
+    build: .
+    container_name: rag-system
+    ports:
+      - "8501:8501"
+    environment:
+      - LLAMA_API_KEY=${llx-pa3i34PlG4BeqxsKlD7D7G60pMoCTvdHQ76tKsb0yyKqVDVJ}
+      - OPENROUTER_API_KEY=${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}
+    restart: unless-stopped
