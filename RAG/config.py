@@ -33,8 +33,8 @@ GEMINI_MODEL = "gemini-2.5-flash"
 CROSS_ENCODER_MODEL = "cross-encoder/qnli-distilroberta-base"
 
 # Chunking settings
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 100
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200
 
 # Retrieval settings
 TOP_K_RESULTS = 20
@@ -48,9 +48,7 @@ SUPPORTED_EXTENSIONS = {
     '.pdf': 'pdf',
     '.txt': 'text',
     '.doc': 'word',
-    '.docx': 'word',
-    '.csv': 'csv',
-    
+    '.docx': 'word'
 }
 
 free_models = {

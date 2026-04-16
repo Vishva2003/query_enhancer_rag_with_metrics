@@ -179,7 +179,7 @@ if prompt := st.chat_input("Ask a question about the document..."):
                 
                 # Step 2: Retrieve documents
                 retrieve_start = time.time()
-                retrieved_data = retriever.retrieve_multi(enhanced_query, st.session_state.collection, top_k=top_k_results)
+                retrieved_data = retriever.retrieve_multi(enhanced_query, st.session_state.collection, top_k=top_k_results*2)  # Retrieve more for better reranking
                 retrieve_time = time.time() - retrieve_start
                 
                 filtered_docs = []
@@ -192,7 +192,7 @@ if prompt := st.chat_input("Ask a question about the document..."):
                 
                 # Step 3: Rerank documents
                 rerank_start = time.time()
-                reranked_docs = reranker.rerank(prompt, filtered_docs, top_k=10)
+                reranked_docs = reranker.rerank(prompt, filtered_docs, top_k=top_k_results)
                 rerank_time = time.time() - rerank_start
 
                 if not filtered_docs:
@@ -231,7 +231,7 @@ if prompt := st.chat_input("Ask a question about the document..."):
                     
                     # Calculate retrieval metrics
                     context_precision = 1.0 - (avg_distance / 2) if avg_distance else 0.5  # Normalized score
-                    context_recall = min(1.0, len(reranked_docs) / top_k_results) if top_k_results > 0 else 0
+                    context_recall = min(1.0, len(filtered_docs) / top_k_results) if top_k_results > 0 else 0
                     
                     with st.expander("Retrieved context"):
                         for i, doc in enumerate(reranked_docs[:5]):
