@@ -52,6 +52,15 @@ if "query_history" not in st.session_state:
 if "metrics_enabled" not in st.session_state:
     st.session_state.metrics_enabled = True
 
+if "document_loading_time" not in st.session_state:
+    st.session_state.document_loading_time = 0.0
+
+if "chunk_time" not in st.session_state:
+    st.session_state.chunk_time = 0.0
+
+if "embedder_time" not in st.session_state:
+    st.session_state.embedder_time = 0.0
+
 st.set_page_config(page_title="Rag System", layout="wide")
 st.title("RAG System")
 
@@ -85,10 +94,10 @@ with st.sidebar:
     col1, col2 = st.columns([1,1])
     
     with col1:
-        start_processing = st.button("Start", type="primary", use_container_width=True)
+        start_processing = st.button("Start", type="primary", width="stretch")
     
     with col2:
-        if st.button("Restart", type="secondary", use_container_width=True):
+        if st.button("Restart", type="secondary", width="stretch"):
             # Clear all session state
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
@@ -118,15 +127,20 @@ if start_processing:
     with st.status("Processing document...", expanded=True) as status:
         try:
             loader, chunker, embedder, _, _, _, _, _ = get_rag_tools()
-
+            text_start_time = time.time()
             text = loader.load_file(str(temp_path))
-
+            st.session_state.document_loading_time = time.time() - text_start_time
+            
+            chunk_start_time = time.time()
             chunk_list = chunker.chunk_text(text, chunk_size, overlap_size)
+            st.session_state.chunk_time = time.time() - chunk_start_time
 
+            embedder_start_time = time.time()
             embedder = embedder.add_collection(
                 chunk_list,
                 collection=st.session_state.collection
             )
+            st.session_state.embedder_time = time.time() - embedder_start_time
 
             st.session_state["doc_processed"] = True
             st.session_state.total_chunks = len(chunk_list)
@@ -175,7 +189,9 @@ if prompt := st.chat_input("Ask a question about the document..."):
                 model_id = free_models[current_model_key]
                 
                 # Step 1: Enhance query
+                query_timing_start = time.time()
                 enhanced_query = queryEnhancer.enhance(prompt)
+                query_timing = time.time() - query_timing_start
                 
                 # Step 2: Retrieve documents
                 retrieve_start = time.time()
@@ -207,6 +223,7 @@ if prompt := st.chat_input("Ask a question about the document..."):
                         'model_id': model_id,
                         'retrieved_count': 0,
                         'avg_distance': 0,
+                        'query_time': query_timing,
                         'retrieve_time': retrieve_time,
                         'rerank_time': rerank_time,
                         'total_time': time.time() - start_time,
@@ -240,6 +257,9 @@ if prompt := st.chat_input("Ask a question about the document..."):
                     # Store metrics
                     metrics = {
                         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        'document_loading': st.session_state.document_loading_time,
+                        'chunk_time': st.session_state.chunk_time,
+                        'embedder_time': st.session_state.embedder_time,
                         'query': prompt,
                         'enhanced_query': enhanced_query,
                         'model_used': current_model_key,
@@ -249,6 +269,7 @@ if prompt := st.chat_input("Ask a question about the document..."):
                         'avg_distance': round(avg_distance, 4),
                         'context_precision': round(context_precision, 4),
                         'context_recall': round(context_recall, 4),
+                        'query_time': round(query_timing, 3),
                         'retrieve_time': round(retrieve_time, 3),
                         'rerank_time': round(rerank_time, 3),
                         'generate_time': round(generate_time, 3),
@@ -272,6 +293,10 @@ if prompt := st.chat_input("Ask a question about the document..."):
                         with st.expander("📊 Detailed Metrics"):
                             st.json({
                                 "Model": current_model_key,
+                                'Document_Loading': f"{st.session_state.document_loading_time:.2f}s",
+                                'Chunking': f"{st.session_state.chunk_time:.2f}s",
+                                'Embedding Time': f"{st.session_state.embedder_time:.2f}s",
+                                "Query Time": f"{query_timing:.2f}s",
                                 "Retrieval Time": f"{retrieve_time:.2f}s",
                                 "Rerank Time": f"{rerank_time:.2f}s", 
                                 "Generation Time": f"{generate_time:.2f}s",

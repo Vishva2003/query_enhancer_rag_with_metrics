@@ -1,5 +1,4 @@
 import streamlit as st
-from dotenv import load_dotenv
 from pathlib import Path
 import os
 import tempfile as temp
@@ -7,21 +6,22 @@ import pandas as pd
 import time
 from datetime import datetime
 from config import free_models
+from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
 
 @st.cache_resource()
 def get_rag_tools():
-    # FIXED: Direct imports instead of rag_agent.tools.*
     from rag_agent.tools.document_loader import DocumentLoader
     from rag_agent.tools.chunker import Chunker
     from rag_agent.tools.embedder import Embedder
     from rag_agent.tools.retriever import Retriever
     from rag_agent.tools.reranker import Reranker
     from rag_agent.tools.generator import Generator
-    from rag_agent.tools.evaluation import RAGEvaluator
     from query_enhancer.tools.query_agent import QueryEnhancer
+    from rag_agent.tools.evaluation import RAGEvaluator 
 
     loader = DocumentLoader()
     chunker = Chunker()
@@ -34,7 +34,6 @@ def get_rag_tools():
     return loader, chunker, embedder, queryEnhancer, retriever, reranker, generator, evaluator
 
 
-# Session state initialization
 if "collection" not in st.session_state:
     st.session_state.collection = None
 
@@ -48,13 +47,19 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 if "query_history" not in st.session_state:
-    st.session_state.query_history = []
+    st.session_state.query_history = []  # Track all queries and their metrics
 
 if "metrics_enabled" not in st.session_state:
     st.session_state.metrics_enabled = True
 
-if "show_metrics" not in st.session_state:
-    st.session_state.show_metrics = False
+if "document_loading_time" not in st.session_state:
+    st.session_state.document_loading_time = 0.0
+
+if "chunk_time" not in st.session_state:
+    st.session_state.chunk_time = 0.0
+
+if "embedder_time" not in st.session_state:
+    st.session_state.embedder_time = 0.0
 
 st.set_page_config(page_title="Rag System", layout="wide")
 st.title("RAG System")
@@ -62,7 +67,7 @@ st.title("RAG System")
 with st.sidebar:
     st.header("Document Loader")
     upload_file = st.file_uploader("Upload a document [txt, pdf, docx, doc]", type=["pdf", "txt", "docx", "doc"])
-    chunk_size = st.slider("Chunk size (Characters)", 1000, 2500, 1000, step=15)
+    chunk_size = st.slider("Chunk size (Characters)", 1000,2500, 1000, step=15)
     overlap_size = st.slider("Chunk overlap (characters)", 100, 500, 200, step=10)
     top_k_results = st.slider("Top K results to retrieve", 1, 40, 10)
     st.session_state.collection = st.text_input("Collection name for the document", placeholder="Sample_collection")
@@ -79,26 +84,25 @@ with st.sidebar:
     
     st.divider()
     
-    st.session_state.metrics_enabled = st.checkbox("Enable RAG Metrics", value=True)
+    st.session_state.metrics_enabled = st.checkbox("📊 Enable RAG Metrics", value=True)
     
     if st.session_state.query_history and st.button("📈 Show Metrics Dashboard"):
         st.session_state.show_metrics = True
     else:
         st.session_state.show_metrics = False
     
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([1,1])
     
     with col1:
-        start_processing = st.button("Start", type="primary", use_container_width=True)
+        start_processing = st.button("Start", type="primary", width="stretch")
     
     with col2:
-        if st.button("Restart", type="secondary", use_container_width=True):
+        if st.button("Restart", type="secondary", width="stretch"):
             # Clear all session state
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
             st.rerun()
 
-# Display chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -106,8 +110,8 @@ for message in st.session_state.messages:
             st.caption(f"🤖 Model: {message['model_used']}")
 
 
-# Document processing
 if start_processing:
+
     if not upload_file:
         st.sidebar.warning("Please upload a document.")
         st.stop()
@@ -123,14 +127,20 @@ if start_processing:
     with st.status("Processing document...", expanded=True) as status:
         try:
             loader, chunker, embedder, _, _, _, _, _ = get_rag_tools()
-
+            text_start_time = time.time()
             text = loader.load_file(str(temp_path))
+            st.session_state.document_loading_time = time.time() - text_start_time
+            
+            chunk_start_time = time.time()
             chunk_list = chunker.chunk_text(text, chunk_size, overlap_size)
+            st.session_state.chunk_time = time.time() - chunk_start_time
 
+            embedder_start_time = time.time()
             embedder = embedder.add_collection(
                 chunk_list,
                 collection=st.session_state.collection
             )
+            st.session_state.embedder_time = time.time() - embedder_start_time
 
             st.session_state["doc_processed"] = True
             st.session_state.total_chunks = len(chunk_list)
@@ -154,9 +164,6 @@ if start_processing:
                 state='error',
                 expanded=False
             )
-            st.error(f"Full error: {str(e)}")
-            import traceback
-            st.code(traceback.format_exc())
 
         finally:
             try:
@@ -164,8 +171,8 @@ if start_processing:
             except:
                 pass
 
-# Query handling
 if prompt := st.chat_input("Ask a question about the document..."):
+
     st.session_state.messages.append({'role': 'user', 'content': prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -182,38 +189,43 @@ if prompt := st.chat_input("Ask a question about the document..."):
                 model_id = free_models[current_model_key]
                 
                 # Step 1: Enhance query
-                enhanced_queries_list = queryEnhancer.enhance(prompt)
+                query_timing_start = time.time()
+                #enhanced_query = queryEnhancer.enhance(prompt)
+                enhanced_query = prompt
+
+                query_timing = time.time() - query_timing_start
                 
                 # Step 2: Retrieve documents
                 retrieve_start = time.time()
-                retrieved_data = retriever.retrieve_multi(enhanced_queries_list, st.session_state.collection, top_k=top_k_results)
+                retrieved_data = retriever.retrieve(enhanced_query, st.session_state.collection, top_k=top_k_results*2)  # Retrieve more for better reranking
                 retrieve_time = time.time() - retrieve_start
                 
-                # Filter by distance
                 filtered_docs = []
                 filtered_distances = []
                 for doc, dist in zip(retrieved_data['documents'], retrieved_data['distances']):
-                    if dist < 1.5:
+                    if dist < 1.5:  # Stricter threshold
                         filtered_docs.append(doc)
                         filtered_distances.append(dist)
                 print(f"Retrieved {len(filtered_docs)} documents")
                 
-                # Step 3: Rerank
+                # Step 3: Rerank documents
                 rerank_start = time.time()
-                reranked_docs = reranker.rerank(prompt, filtered_docs, top_k=5)
+                reranked_docs = reranker.rerank(prompt, filtered_docs, top_k=top_k_results)
                 rerank_time = time.time() - rerank_start
 
                 if not filtered_docs:
                     answer = "No relevant information found in the document."
                     
+                    # Store metrics even for empty results
                     metrics = {
                         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         'query': prompt,
-                        'enhanced_query': str(enhanced_queries_list),
+                        'enhanced_query': enhanced_query,
                         'model_used': current_model_key,
                         'model_id': model_id,
                         'retrieved_count': 0,
                         'avg_distance': 0,
+                        'query_time': query_timing,
                         'retrieve_time': retrieve_time,
                         'rerank_time': rerank_time,
                         'total_time': time.time() - start_time,
@@ -223,25 +235,35 @@ if prompt := st.chat_input("Ask a question about the document..."):
                     }
                 else:
                     context = reranker.format_context(reranked_docs)
+                    
                     avg_distance = sum(filtered_distances[:len(reranked_docs)]) / len(reranked_docs) if filtered_distances else 0
                     
+                    # Generate answer
                     generate_start = time.time()
-                    answer = generator.generate(prompt, context, model=model_id, temperature=0.3)
+                    answer = generator.generate(
+                        prompt,
+                        context,
+                        model=model_id,
+                        temperature=0.3
+                    )
                     generate_time = time.time() - generate_start
                     
-                    context_precision = 1.0 - (avg_distance / 2) if avg_distance else 0.5
-                    context_recall = min(1.0, len(reranked_docs) / top_k_results) if top_k_results > 0 else 0
+                    # Calculate retrieval metrics
+                    context_precision = 1.0 - (avg_distance / 2) if avg_distance else 0.5  # Normalized score
+                    context_recall = min(1.0, len(filtered_docs) / top_k_results) if top_k_results > 0 else 0
                     
-                    # Retrieved context
-                    with st.expander("📚 Retrieved Context"):
-                        for i, (doc, score) in enumerate(reranked_docs[:5]):
-                            st.markdown(f"**Doc {i+1} (score: {score:.2f}):** {doc[:200]}...")
+                    with st.expander("Retrieved context"):
+                        for i, doc in enumerate(reranked_docs[:5]):
+                            st.markdown(f"**Doc {i+1}:** {doc[:200]}...")
                     
-                    # Metrics
+                    # Store metrics
                     metrics = {
                         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        'document_loading': st.session_state.document_loading_time,
+                        'chunk_time': st.session_state.chunk_time,
+                        'embedder_time': st.session_state.embedder_time,
                         'query': prompt,
-                        'enhanced_query': str(enhanced_queries_list),
+                        'enhanced_query': enhanced_query,
                         'model_used': current_model_key,
                         'model_id': model_id,
                         'retrieved_count': len(filtered_docs),
@@ -249,14 +271,15 @@ if prompt := st.chat_input("Ask a question about the document..."):
                         'avg_distance': round(avg_distance, 4),
                         'context_precision': round(context_precision, 4),
                         'context_recall': round(context_recall, 4),
+                        'query_time': round(query_timing, 3),
                         'retrieve_time': round(retrieve_time, 3),
                         'rerank_time': round(rerank_time, 3),
                         'generate_time': round(generate_time, 3),
                         'total_time': round(time.time() - start_time, 3),
-                        'answer': answer[:100] + "..."
+                        'answer': answer[:100] + "..."  # Preview
                     }
                     
-                    # Show metrics
+                    # Show metrics if enabled
                     if st.session_state.metrics_enabled:
                         col1, col2, col3, col4 = st.columns(4)
                         with col1:
@@ -267,17 +290,37 @@ if prompt := st.chat_input("Ask a question about the document..."):
                             st.metric("Docs", len(reranked_docs))
                         with col4:
                             st.metric("Time", f"{metrics['total_time']:.1f}s")
+                        
+                        # Show detailed metrics in expander
+                        with st.expander("📊 Detailed Metrics"):
+                            st.json({
+                                "Model": current_model_key,
+                                'Document_Loading': f"{st.session_state.document_loading_time:.2f}s",
+                                'Chunking': f"{st.session_state.chunk_time:.2f}s",
+                                'Embedding Time': f"{st.session_state.embedder_time:.2f}s",
+                                "Query Time": f"{query_timing:.2f}s",
+                                "Retrieval Time": f"{retrieve_time:.2f}s",
+                                "Rerank Time": f"{rerank_time:.2f}s", 
+                                "Generation Time": f"{generate_time:.2f}s",
+                                "Avg Distance": f"{avg_distance:.4f}",
+                                "Retrieved Docs": len(filtered_docs),
+                                "Reranked Docs": len(reranked_docs)
+                            })
 
                 st.markdown(answer)
+                
+                # Add model 
                 st.caption(f"🤖 Generated by: {current_model_key}")
+                
+                # Add to query history
                 st.session_state.query_history.append(metrics)
 
             except Exception as e:
-                st.error(f"Error: {e}")
-                import traceback
-                st.code(traceback.format_exc())
+                st.error(f"Error initializing RAG tools: {e}")
                 answer = f"Error: {e}"
+                st.markdown(answer)
                 
+                # Store error in history
                 st.session_state.query_history.append({
                     'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'query': prompt,
@@ -286,17 +329,19 @@ if prompt := st.chat_input("Ask a question about the document..."):
                     'answer': answer
                 })
 
+    # Add assistant message to history with model info
     st.session_state.messages.append({
         'role': 'assistant', 
         'content': answer,
         'model_used': current_model_key if 'current_model_key' in locals() else selected_model
     })
 
-# Metrics Dashboard (unchanged)
 if st.session_state.get('show_metrics', False) and st.session_state.query_history:
     with st.expander("📊 RAG Metrics Dashboard", expanded=True):
+
         df = pd.DataFrame(st.session_state.query_history)
-        
+
+        # Show summary statistics
         st.subheader("📈 Summary Statistics")
         col1, col2, col3, col4 = st.columns(4)
         
@@ -312,6 +357,7 @@ if st.session_state.get('show_metrics', False) and st.session_state.query_histor
             avg_recall = df['context_recall'].mean() if 'context_recall' in df.columns else 0
             st.metric("Avg Recall", f"{avg_recall:.2f}")
         
+        # Model performance breakdown
         if 'model_used' in df.columns:
             st.subheader("🤖 Model Performance")
             model_stats = df.groupby('model_used').agg({
@@ -322,12 +368,14 @@ if st.session_state.get('show_metrics', False) and st.session_state.query_histor
             }).round(3)
             st.dataframe(model_stats)
         
+        # Query history table
         st.subheader("📋 Query History")
         display_cols = ['timestamp', 'query', 'model_used', 'retrieved_count', 
                     'context_precision', 'context_recall', 'total_time']
         available_cols = [col for col in display_cols if col in df.columns]
         st.dataframe(df[available_cols])
         
+        # Export button
         csv = df.to_csv(index=False)
         st.download_button(
             label="📥 Download Metrics CSV",
@@ -336,7 +384,6 @@ if st.session_state.get('show_metrics', False) and st.session_state.query_histor
             mime="text/csv"
         )
 
-# Footer
 st.divider()
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -349,6 +396,6 @@ with col2:
         st.info("📄 No Document")
 with col3:
     st.info(f"🤖 Model: {st.session_state.selected_model}")
-
+    
 if st.session_state.query_history:
     st.caption(f"📊 Tracked {len(st.session_state.query_history)} queries with metrics")
