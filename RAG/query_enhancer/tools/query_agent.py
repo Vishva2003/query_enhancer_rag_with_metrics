@@ -3,6 +3,7 @@ from pathlib import Path
 from openai import OpenAI
 import re
 import json
+import time
 
 try:
     from config import OPENROUTER_API_KEY, OPENROUTER_SITE_NAME, OPENROUTER_BASE_URL, OPENROUTER_SITE_URL
@@ -45,6 +46,8 @@ Example:
 User question: {query}
 """ 
 
+# Fallback model (only one)
+FALLBACK_MODEL = "z-ai/glm-5.1"
 
 class QueryEnhancer:
     def __init__(
@@ -52,28 +55,32 @@ class QueryEnhancer:
         n_subqueries=3,
         use_hyde=True,
         use_stepback=True,
-        default_model="x-ai/grok-4.1-fast"
+        default_model="x-ai/grok-4.1-fast",
+        fallback_model=None,
+        max_retries=2,
+        retry_delay=2
     ):
         self.api_key = OPENROUTER_API_KEY
         if not self.api_key:
             raise ValueError("OpenRouter API key is required. Get one at https://openrouter.ai")
 
-        # Initialize OpenAI client with OpenRouter base URL
         self.client = OpenAI(
             base_url=OPENROUTER_BASE_URL,
             api_key=self.api_key,
         )
         
-        # Optional headers for rankings
         self.site_url = OPENROUTER_SITE_URL
         self.site_name = OPENROUTER_SITE_NAME
         self.n_subqueries = n_subqueries
         self.use_hyde = use_hyde
         self.use_stepback = use_stepback
         self.default_model = default_model
+        self.fallback_model = fallback_model or FALLBACK_MODEL
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
 
     def enhance(self, query):
-        parsed = self._call_agent(query)
+        parsed = self._call_agent_with_fallback(query)
         queries = [query]
 
         for q in parsed.get("sub_queries", []):
@@ -101,6 +108,55 @@ class QueryEnhancer:
         self._print_summary(unique)
         return unique
 
+    def _call_agent_with_fallback(self, query):
+        """Call API with single fallback model on failure"""
+        
+        # Try primary model first
+        print(f"[QueryEnhancer] Trying primary model: {self.default_model}")
+        
+        for attempt in range(self.max_retries):
+            try:
+                parsed = self._call_agent(query, model=self.default_model)
+                
+                if parsed and parsed.get("sub_queries") and parsed.get("hyde") and parsed.get("step_back"):
+                    print(f"[QueryEnhancer] ✅ Success with primary model")
+                    return parsed
+                    
+            except Exception as e:
+                error_msg = str(e)
+                if "429" in error_msg or "rate-limited" in error_msg.lower():
+                    print(f"[QueryEnhancer] ⚠️ Rate limit on primary, attempt {attempt + 1}/{self.max_retries}")
+                    time.sleep(self.retry_delay * (attempt + 1))
+                    continue
+                else:
+                    print(f"[QueryEnhancer] ❌ Primary model failed: {error_msg[:100]}")
+                    break
+        
+        # Try fallback model
+        print(f"[QueryEnhancer] 🔄 Switching to fallback model: {self.fallback_model}")
+        
+        for attempt in range(self.max_retries):
+            try:
+                parsed = self._call_agent(query, model=self.fallback_model)
+                
+                if parsed and parsed.get("sub_queries") and parsed.get("hyde") and parsed.get("step_back"):
+                    print(f"[QueryEnhancer] ✅ Success with fallback model")
+                    return parsed
+                    
+            except Exception as e:
+                error_msg = str(e)
+                if "429" in error_msg or "rate-limited" in error_msg.lower():
+                    print(f"[QueryEnhancer] ⚠️ Rate limit on fallback, attempt {attempt + 1}/{self.max_retries}")
+                    time.sleep(self.retry_delay * (attempt + 1))
+                    continue
+                else:
+                    print(f"[QueryEnhancer] ❌ Fallback model failed: {error_msg[:100]}")
+                    break
+        
+        # Both models failed
+        print(f"[QueryEnhancer] ❌ All models failed. Falling back to original query only")
+        return {}
+
     def _call_agent(self, query, model=None, temperature=0.7, max_tokens=1000, top_p=1):
         """Call OpenRouter API and return parsed JSON response"""
         
@@ -127,13 +183,10 @@ class QueryEnhancer:
                 top_p=top_p
             )
             
-            # Get the response text correctly
             raw = response.choices[0].message.content.strip()
             
-            # Remove markdown code fences if present
             raw = re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", raw, flags=re.MULTILINE).strip()
 
-            # Extract JSON object
             match = re.search(r"\{.*\}", raw, re.DOTALL)
             if match:
                 raw = match.group(0)
@@ -158,12 +211,11 @@ class QueryEnhancer:
             return parsed
         
         except json.JSONDecodeError as e:
-            print(f"[QueryEnhancer] JSON parse error ({e}) — falling back to original query")
-            print(f"[QueryEnhancer] Raw response: {raw[:200]}...")
+            print(f"[QueryEnhancer] JSON parse error ({e})")
             return {}
         except Exception as e:
-            print(f"[QueryEnhancer] API call failed ({e}) — falling back to original query")
-            return {}
+            print(f"[QueryEnhancer] API call failed: {e}")
+            raise
 
     def _print_summary(self, queries):
         labels = ["original", *[f"sub-query {i}" for i in range(1, self.n_subqueries + 1)]]
