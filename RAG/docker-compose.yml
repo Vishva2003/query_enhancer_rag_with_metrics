@@ -9,4 +9,8 @@ services:
     environment:
       - LLAMA_API_KEY=${LLAMA_API_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      - ./vector_db:/app/vector_db
+      - ./data/processed:/app/data/processed
+    user: "root"  
     restart: unless-stopped
