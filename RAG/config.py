@@ -57,7 +57,7 @@ free_models = {
         "Claude-Sonnet-4.5": "anthropic/claude-sonnet-4.5",
         "Deepseek-v3": "deepseek/deepseek-chat-v3.1",
         "Gemini-2.5-Flash-lite": "google/gemini-2.5-flash-lite",
-        "Qwen3.5-flash-02-23": "qwen/qwen3.5-flash-02-23",
+        "Qwen3.5-flash": "qwen/qwen3.5-flash-02-23",
         "MiniMax-m1": "minimax/minimax-m1",
         "Ministral-3": "mistralai/ministral-3b-2512"
     }
